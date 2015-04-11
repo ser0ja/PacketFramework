@@ -2,6 +2,7 @@ PacketFramework
 =============
 
 PacketFramework is a packet editing framework for World of Warcraft. You may create, send, modify, intercept, block, ... packets with your LUA scripts. The only limit is your imagination.
+Here is a [screenshot](http://i.imgur.com/OOiM5Jp.png).
 
 ## Build & Usage
 

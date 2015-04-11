@@ -39,13 +39,13 @@
 struct Offset
 {
     // Network offsets
-    static const intptr_t NetClient_Send2           = 0x002641CD;   // 6.1.0 19702
-    static const intptr_t NetClient_ProcessMessage  = 0x0026262D;   // 6.1.0 19702
+    static const intptr_t NetClient_Send2           = 0x002656B1;   // 6.1.2 19865
+    static const intptr_t NetClient_ProcessMessage  = 0x00263B24;   // 6.1.2 19865
 
     // Helper offsets
-    static const intptr_t CurrentTargetGUID         = 0x00E31D10;   // 6.1.0 19702
-    static const intptr_t LocalPlayer               = 0x00DBCA04;   // 6.1.0 19702
-    static const intptr_t LocalPlayerGUID           = 0x28;         // 6.1.0 19702
+    static const intptr_t CurrentTargetGUID         = 0x00000000;
+    static const intptr_t LocalPlayer               = 0x00000000;
+    static const intptr_t LocalPlayerGUID           = 0x00;
 
     // Dynamic offsets
     static intptr_t NetClient;
