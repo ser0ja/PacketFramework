@@ -177,6 +177,9 @@ int Packet::WriteByteSeq(lua_State* L)
 
 int Packet::WriteMyGUID(lua_State* L)
 {
+    if (!Offset::LocalPlayer || !Offset::LocalPlayerGUID)
+        return 0;
+
     intptr_t localPlayer = *(intptr_t*)(Utils::GetBaseAddress() + Offset::LocalPlayer);
     uint64_t low = *(uint64_t*)(localPlayer + Offset::LocalPlayerGUID);
     uint64_t high = *(uint64_t*)(localPlayer + Offset::LocalPlayerGUID + sizeof(uint64_t));
@@ -204,6 +207,9 @@ int Packet::WriteMyGUID(lua_State* L)
 
 int Packet::WriteTargetGUID(lua_State* L)
 {
+    if (!Offset::CurrentTargetGUID)
+        return 0;
+
     uint64_t low = *(uint64_t*)(Utils::GetBaseAddress() + Offset::CurrentTargetGUID);
     uint64_t high = *(uint64_t*)(Utils::GetBaseAddress() + Offset::CurrentTargetGUID + sizeof(uint64_t));
 
