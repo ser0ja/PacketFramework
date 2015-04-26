@@ -43,9 +43,9 @@ struct Offset
     static const intptr_t NetClient_ProcessMessage  = 0x00263B24;   // 6.1.2 19865
 
     // Helper offsets
-    static const intptr_t CurrentTargetGUID         = 0x00000000;
-    static const intptr_t LocalPlayer               = 0x00000000;
-    static const intptr_t LocalPlayerGUID           = 0x00;
+    static const intptr_t CurrentTargetGUID         = 0x00E35F20;   // 6.1.2 19865
+    static const intptr_t LocalPlayer               = 0x00DC0BC8;   // 6.1.2 19865
+    static const intptr_t LocalPlayerGUID           = 0x28;         // 6.1.2 19865
 
     // Dynamic offsets
     static intptr_t NetClient;
