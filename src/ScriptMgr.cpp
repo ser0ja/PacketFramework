@@ -49,6 +49,32 @@ bool ScriptMgr::Load(const std::string& scriptName)
         return false;
     }
 
+    // LUA function callback
+    if (lua_getglobal(state, "OnLoad"))
+    {
+        // Call the function
+        try
+        {
+            if (lua_pcall(state, 0, 0, 0))
+            {
+                std::string error = lua_tostring(state, -1);
+                Console::SetTextColor(RED);
+                printf("LUA error: %s\n", error.c_str());
+                Console::SetTextColor(DARKGRAY);
+            }
+        }
+        catch (const ByteBufferException& e)
+        {
+            Console::SetTextColor(RED);
+            printf("ByteBufferException: %s\n", e.what());
+            Console::SetTextColor(DARKGRAY);
+        }
+    }
+    else
+    {
+        lua_pop(state, 1);
+    }
+
     Scripts[scriptName] = state;
     Console::SetTextColor(YELLOW);
     printf("Script '%s' loaded!\n", scriptName.c_str());
@@ -66,6 +92,32 @@ bool ScriptMgr::Unload(const std::string& scriptName)
         printf("Script '%s' is not loaded!\n", scriptName.c_str());
         Console::SetTextColor(DARKGRAY);
         return false;
+    }
+
+    // LUA function callback
+    if (lua_getglobal(itr->second, "OnUnload"))
+    {
+        // Call the function
+        try
+        {
+            if (lua_pcall(itr->second, 0, 0, 0))
+            {
+                std::string error = lua_tostring(itr->second, -1);
+                Console::SetTextColor(RED);
+                printf("LUA error: %s\n", error.c_str());
+                Console::SetTextColor(DARKGRAY);
+            }
+        }
+        catch (const ByteBufferException& e)
+        {
+            Console::SetTextColor(RED);
+            printf("ByteBufferException: %s\n", e.what());
+            Console::SetTextColor(DARKGRAY);
+        }
+    }
+    else
+    {
+        lua_pop(itr->second, 1);
     }
 
     lua_close(itr->second);

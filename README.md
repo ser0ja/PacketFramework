@@ -12,10 +12,18 @@ The framework tries to locate your scripts under the 'World of Warcraft/Scripts'
 
 ## Documentation
 
-There are two callbacks in every script, which can be considered as entry points.
-The **OnSend** function is called when your client sends a packet, and the **OnProcessMessage** is called when your client receives a packet. Both of these functions have a Packet parameter. Our Packet class is built on top of TrinityCore's ByteBuffer, so the syntax should be straightforward if you are a developer. If these functions return true, it means the packet should be processed (either sent to the server or processed by the client). If they return false, the packet is discarded like it has never been sent or received.
+Currently there are 4 callbacks that you can override in your scripts.
 
-The two main classes are Packet and MemoryEditor.
++ OnLoad
+  + Called then the script is loaded
++ OnUnload
+  + Called when the script is unloaded
++ OnSend(packet)
+  + Called when your client sends a packet
++ OnProcessMessage(packet)
+  + Called when your client receives a packet
+
+The two main classes usable in scripts are Packet and MemoryEditor.
 
 Members of **Packet**
 + WriteInt8(value)
@@ -31,9 +39,9 @@ Members of **Packet**
 + WriteBit(value)
 + WriteBits(value)
 + WriteByteSeq(value)
-+ WriteMyGUID(value)
++ WriteMyGUID()
   + Works only if both Offset::LocalPlayer and Offset::LocalPlayerGUID are provided
-+ WriteTargetGUID(value)
++ WriteTargetGUID()
   + Works only if Offset::CurrentTargetGUID is provided
 + ReadInt8()
 + ReadInt16()
