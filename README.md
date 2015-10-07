@@ -99,7 +99,7 @@ Create a file (ArbitraryName.lua) per example in your 'World of Warcraft/Scripts
 + Anti-AFK (The OnSend function returns false thus preventing the packet to be sent to the server)
 ```
 function OnSend(packet)
-    if (packet.GetOpcode() == CMSG_MESSAGECHAT_AFK) then
+    if (packet.GetOpcode() == CMSG_CHAT_MESSAGE_AFK) then
         return false
     end
 
@@ -128,7 +128,7 @@ end
 + Dump packet contents (just a shortcut)
 ```
 function OnSend(packet)
-    if packet.GetOpcode() == SMSG_TIME_SYNC_REQ then
+    if packet.GetOpcode() == SMSG_TIME_SYNC_REQUEST then
         serial, latency = packet.Dump("int32 int32")
         print(serial, latency)
     end
