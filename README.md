@@ -15,13 +15,15 @@ The framework tries to locate your scripts under the 'World of Warcraft/Scripts'
 Currently there are 4 callbacks that you can override in your scripts.
 
 + OnLoad
-  + Called then the script is loaded
+  + Called when the script is loaded
 + OnUnload
   + Called when the script is unloaded
 + OnSend(packet)
   + Called when your client sends a packet
+  + Return 'true' means send the packet, 'false' means discard the packet
 + OnProcessMessage(packet)
   + Called when your client receives a packet
+  + Return 'true' means process the packet, 'false' means discard the packet
 
 The two main classes usable in scripts are Packet and MemoryEditor.
 
