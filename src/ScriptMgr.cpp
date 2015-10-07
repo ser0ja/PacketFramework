@@ -39,15 +39,6 @@ bool ScriptMgr::Load(const std::string& scriptName)
     // Push opcode enum
     AddOpcodes(state);
 
-    // Include 'PacketFramework.lua'
-    if (luaL_dofile(state, "Scripts/PacketFramework.lua"))
-    {
-        Console::SetTextColor(RED);
-        printf("LUA error: %s\n", lua_tostring(state, -1));
-        Console::SetTextColor(DARKGRAY);
-        return false;
-    }
-
     // Include '<scriptName>.lua'
     if (luaL_dofile(state, std::string("Scripts/" + scriptName + ".lua").c_str()))
     {
@@ -120,7 +111,11 @@ bool ScriptMgr::OnSend(CDataStore* data)
         Packet* packet = new Packet(data);
 
         // LUA function callback
-        lua_getglobal(script.second, "OnSend");
+        if (!lua_getglobal(script.second, "OnSend"))
+        {
+            lua_pop(script.second, 1);
+            continue;
+        }
 
         // Push packet
         Luna<Packet>::push(script.second, packet);
@@ -178,7 +173,11 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
         Packet* packet = new Packet(data);
 
         // LUA function callback
-        lua_getglobal(script.second, "OnProcessMessage");
+        if (!lua_getglobal(script.second, "OnProcessMessage"))
+        {
+            lua_pop(script.second, 1);
+            continue;
+        }
 
         // Push packet
         Luna<Packet>::push(script.second, packet);

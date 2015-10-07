@@ -8,7 +8,7 @@ Here is a [screenshot](http://i.imgur.com/OOiM5Jp.png).
 
 This project is a DLL, which you'll need to inject into your running WoW.exe process. Only x86 (32-bit) version of the game is supported at the moment.
 
-The framework tries to locate your scripts under the 'World of Warcraft/Scripts' folder. In order to prevent unexpected errors with malformed custom scripts, you need to copy the [PacketFramework.lua](https://github.com/Dehravor/PacketFramework/releases/download/untagged-60497b934841db615227/PacketFramework.lua) first into the Scripts directory.
+The framework tries to locate your scripts under the 'World of Warcraft/Scripts' folder.
 
 ## Documentation
 
