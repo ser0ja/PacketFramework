@@ -1,31 +1,56 @@
 PacketFramework
 =============
 
-PacketFramework is a packet editing framework for World of Warcraft. You may create, send, modify, intercept, block, ... packets with your LUA scripts. The only limit is your imagination.
-Here is a [screenshot](http://i.imgur.com/OOiM5Jp.png).
+PacketFramework is a packet editor framework for retail World of Warcraft using LUA scripts. You can forge new packets, modify existing ones and discard undesired packets at your will.
 
-## Build & Usage
+**WARNING**: Please respect Blizzard's [EULA](http://us.blizzard.com/en-us/company/legal/eula.html) while using the tool. This project is meant for educational purposes only and you are highly discouraged to exploit any aspects of the game.
 
-This project is a DLL, which you'll need to inject into your running WoW.exe process. Only x86 (32-bit) version of the game is supported at the moment.
+## How to build
 
-The framework tries to locate your scripts under the 'World of Warcraft/Scripts' folder.
+1. Download the source code from the repository
+2. Run CMake to create your Visual Studio solution files
+3. Compile the DLL with Visual Studio
 
+## How to use
+
+The resulting binary is a DLL file, which you need to inject into your running 'Wow.exe' process. **NOTE:** Only x86 (32-bit) version of the game is supported at the moment. Please ensure that you start the game with the appropriate executable. World of Warcraft Launcher uses 'Wow-64.exe' which is *NOT* supported yet.
+
+The framework tries to locate your scripts under the 'C:/Path/To/Your/World of Warcraft/Scripts' folder. All of your script files must have '.lua' extension, and the name of the file is equivalent to the script's name.
+
+## Console Commands
++ load ScriptName
+  + Executes 'C:/Path/To/Your/World of Warcraft/Scripts/ScriptName.lua' and calls its OnLoad callback
++ unload ScriptName
+  + Unloads the given script and calls its OnUnload callback
++ unloadall
+  + Unloads all loaded scripts
+
+**NOTE:** Closing the console window terminates your World of Warcraft process. If you want to close a script, please use the *unload* command.
+
+## Callbacks
+
+There are 4 callbacks which you can override in your scripts.
+
++ OnLoad()
+  + Called (once) when the script is loaded
+  + This method can be considered as a constructor
+  + No return value
++ OnUnload()
+  + Called (once) when the script is unloaded
+  + This method can be considered as a destructor
+  + No return value
++ OnSend(packet)
+  + Called BEFORE your game client sends a packet (CMSG)
+  + Return value *true*: Send the packet to the server
+  + Return value *false*: Discard the packet
++ OnProcessMessage(packet)
+  + Called BEFORE your game client processes an incoming packet (SMSG)
+  + Return value *true*: Process the packet
+  + Return value *false*: Discard the packet
+ 
 ## Documentation
 
-Currently there are 4 callbacks that you can override in your scripts.
-
-+ OnLoad
-  + Called when the script is loaded
-+ OnUnload
-  + Called when the script is unloaded
-+ OnSend(packet)
-  + Called when your client sends a packet
-  + Return 'true' means send the packet, 'false' means discard the packet
-+ OnProcessMessage(packet)
-  + Called when your client receives a packet
-  + Return 'true' means process the packet, 'false' means discard the packet
-
-The two main classes usable in scripts are Packet and MemoryEditor.
+The two main classes in your scripts are **Packet** and **MemoryEditor**. The Packet class is built on top of TrinityCore's ByteBuffer, so the syntax should be straightforward if you are a developer. The MemoryEditor class helps you to access the memory of the game if you need specific values (e.g. walk speed of the player).
 
 Members of **Packet**
 + WriteInt8(value)
@@ -42,11 +67,8 @@ Members of **Packet**
 + WriteBits(value)
 + WriteByteSeq(value)
 + WriteMyGUID()
-  + Works only if both Offset::LocalPlayer and Offset::LocalPlayerGUID are provided
 + WriteTargetGUID()
-  + Works only if Offset::CurrentTargetGUID is provided
 + WriteMouseOverGUID()
-  + Works only if Offset::MouseOverGUID is provided
 + ReadInt8()
 + ReadInt16()
 + ReadInt32()
@@ -58,19 +80,19 @@ Members of **Packet**
 + ReadString()
 + ReadCString()
 + ReadBit()
-+ ReadBits()
++ ReadBits(size)
 + ReadByteSeq()
 + FlushBits()
 + ResetBitPosition()
 + Print()
-  + Prints the raw hex bytes of the packet
+  + Prints the content of the packet in hexadecimal form
 + Dump()
-  + It's a shortcut for fast packet reading. You can find an example below.
+  + It's a shortcut for fast packet reading - you'll find an example below.
 + GetSize()
 + GetOpcode()
-  + Returns an integer (like 0x1234)
+  + Returns the opcode as an integer (0x1234)
 + GetOpcodeStr()
-  + Returns a string (like "CMSG_PING")
+  + Returns the opcode as a string ("CMSG_PING")
 + SetOpcode(opcode)
 + SetWritePosition(wpos)
 + GetWritePosition()
@@ -80,14 +102,14 @@ Members of **Packet**
   + Sets the write position to the current read position
 + SyncReadPosition()
   + Sets the read position to the current write position
-+ Truncate()
-  + Deletes everything after position
++ Truncate(position)
+  + Deletes everything after the given position
 + Process()
-  + Process the packet with the game client instantly
+  + Process a packet instantly (SMSG), useful if you create custom packets
 + Send()
-  + Send the packet to the server instantly
-  
-Members of **MemoryEditor** (In case you want to modify something in memory)
+  + Send a packet (CMSG) to the server, useful if you create custom packets
+
+Members of **MemoryEditor**
 + GetBaseAddress()
 + ReadInt8(offset)
 + ReadInt16(offset)
@@ -106,30 +128,36 @@ Members of **MemoryEditor** (In case you want to modify something in memory)
 
 ## Examples
 
-Create a file (ArbitraryName.lua) per example in your 'World of Warcraft/Scripts' directory and type 'load ArbitraryName' in the console after the framework has been injected.
+Create a file (Example.lua) in your Scripts directory, copy one of the examples below then type 'load Example' in the console after the framework has been injected.
 
-+ Anti-AFK (The OnSend function returns false thus preventing the packet to be sent to the server)
-```
++ Discard a packet
+``` lua
 function OnSend(packet)
+    -- Do not send this specific packet to the server
     if (packet.GetOpcode() == CMSG_CHAT_MESSAGE_AFK) then
         return false
     end
 
+    -- But send everything else
     return true
 end
 ```
 
-+ Change MOTD (Creates a new MOTD packet and makes the client process it then discards the original one)
-```
++ Create a custom packet
+``` lua
 function OnProcessMessage(packet)
-    if packet.GetOpcode() == SMSG_MOTD then
-        local customMOTD = Packet(SMSG_MOTD)
+    -- When message of the day is received
+    if (packet.GetOpcode() == SMSG_MOTD) then
+        -- Create a custom packet containing our own message
+        customMOTD = Packet(SMSG_MOTD)
         customMOTD.WriteBits(1, 4)
         customMOTD.FlushBits()
         customMOTD.WriteBits(32, 7)
         customMOTD.FlushBits()
         customMOTD.WriteString("PacketFramework has been loaded!")
+        -- Process our packet
         customMOTD.Process()
+        -- Discard the original one
         return false
     end
 
@@ -137,35 +165,72 @@ function OnProcessMessage(packet)
 end
 ```
 
-+ Dump packet contents (just a shortcut)
-```
-function OnSend(packet)
-    if packet.GetOpcode() == SMSG_TIME_SYNC_REQUEST then
-        serial, latency = packet.Dump("int32 int32")
-        print(serial, latency)
-    end
-    return true
-end
-```
-
-+ Memory read (out of date, offsets are for older version)
-```
-function PrintClientPosition()
++ Memory read (*offsets are outdated*)
+``` lua
+function GetPlayerPosition()
     editor = MemoryEditor()
-    localPlayer = editor.ReadInt32(editor.GetBaseAddress() + 0x00DBCA04)
-    print(editor.ReadFloat(localPlayer + 0xA90), editor.ReadFloat(localPlayer + 0xA94), editor.ReadFloat(localPlayer + 0xA98))
+    player = editor.ReadInt32(editor.GetBaseAddress() + 0x00DBCA04)
+    x = editor.ReadFloat(player + 0xA90)
+    y = editor.ReadFloat(player + 0xA94)
+    z = editor.ReadFloat(player + 0xA98)
+    print(x, y, z)
 end
 ```
 
-+ A very simple packet logger
-```
++ A simple packet logger
+``` lua
 function OnSend(packet)
     print("SEND", packet.GetOpcodeStr(), "SIZE", packet.GetSize())
     return true
 end
 
 function OnProcessMessage(packet)
-    print("RECV", packet.GetOpcode())
+    print("RECV", packet.GetOpcodeStr(), "SIZE", packet.GetSize())
+    return true
+end
+```
+
++ Read content of packet
+``` lua
+function OnSend(packet)
+    if (packet.GetOpcode() == CMSG_RANDOM_ROLL) then
+        min = packet.ReadInt32()
+        max = packet.ReadInt32()
+        print("Minimum: ", min, "Maximum: ", max)
+    end
+    
+    return true
+end
+```
+
++ Modify content of packet
+``` lua
+function OnSend(packet)
+    if (packet.GetOpcode() == CMSG_RANDOM_ROLL) then
+        packet.SyncWritePosition()
+        packet.WriteInt32(100)
+        packet.WriteInt32(100)
+        min = packet.ReadInt32()
+        max = packet.ReadInt32()
+        print("Minimum: ", min, "Maximum: ", max)
+    end
+    
+    return true
+end
+```
+
++ Send custom packet
+``` lua
+function OnSend(packet)
+    -- Send a roll packet on jump
+    if (packet.GetOpcode() == CMSG_MOVE_JUMP) then
+        customRoll = Packet(CMSG_RANDOM_ROLL)
+        customRoll.WriteInt32(1)
+        customRoll.WriteInt32(100)
+        customRoll.WriteInt8(1)
+        customRoll.Send()
+    end
+    
     return true
 end
 ```

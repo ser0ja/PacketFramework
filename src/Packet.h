@@ -25,8 +25,6 @@ struct CDataStore;
 class Packet : public ByteBuffer
 {
     public:
-        // Constructs an empty packet with an opcode inserted into the beginning
-        Packet(uint32_t opcode);
         // Constructs a packet from a CDataStore object
         Packet(CDataStore* data);
         // Constructs a packet from LUA

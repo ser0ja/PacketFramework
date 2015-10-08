@@ -26,8 +26,6 @@
 #include <memory>
 #include <iomanip>
 
-Packet::Packet(uint32_t opcode) : ByteBuffer(opcode), changed_(false) { }
-
 Packet::Packet(CDataStore* data) : changed_(false)
 {
     append(data->Buffer, data->Length);
