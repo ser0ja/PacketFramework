@@ -44,6 +44,7 @@ struct Offset
 
     // Helper offsets
     static const intptr_t CurrentTargetGUID         = 0x00EAEE50;   // 6.2.2 20490
+    static const intptr_t MouseOverGUID             = 0x00EAEE20;   // 6.2.2 20490
     static const intptr_t LocalPlayer               = 0x00E37930;   // 6.2.2 20490
     static const intptr_t LocalPlayerGUID           = 0x28;         // 6.2.2 20490
 

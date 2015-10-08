@@ -51,6 +51,7 @@ class Packet : public ByteBuffer
         int WriteByteSeq(lua_State* L);
         int WriteMyGUID(lua_State* L);
         int WriteTargetGUID(lua_State* L);
+        int WriteMouseOverGUID(lua_State* L);
 
         // Read
         int ReadInt8(lua_State* L);

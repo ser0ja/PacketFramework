@@ -19,5 +19,5 @@
 #include <cstdint>
 #include <string>
 
-static const std::string Version = "6.1.2";
-static const uint16_t Build = 19865;
+static const std::string Version = "6.2.2";
+static const uint16_t Build = 20490;

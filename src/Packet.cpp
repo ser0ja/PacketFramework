@@ -234,6 +234,35 @@ int Packet::WriteTargetGUID(lua_State* L)
     return 0;
 }
 
+int Packet::WriteMouseOverGUID(lua_State* L)
+{
+    if (!Offset::MouseOverGUID)
+        return 0;
+
+    uint64_t low = *(uint64_t*)(Utils::GetBaseAddress() + Offset::MouseOverGUID);
+    uint64_t high = *(uint64_t*)(Utils::GetBaseAddress() + Offset::MouseOverGUID + sizeof(uint64_t));
+
+    uint8_t lowMask = 0;
+    uint8_t packedLow[8];
+    size_t packedLowSize = PackUInt64(low, &lowMask, packedLow);
+
+    uint8_t highMask = 0;
+    uint8_t packedHigh[8];
+    size_t packedHighSize = PackUInt64(high, &highMask, packedHigh);
+
+    *this << uint8_t(lowMask);
+    *this << uint8_t(highMask);
+
+    if (packedLowSize)
+        append(packedLow, packedLowSize);
+
+    if (packedHighSize)
+        append(packedHigh, packedHighSize);
+
+    changed_ = true;
+    return 0;
+}
+
 int Packet::ReadInt8(lua_State* L)
 {
     uint8_t value;
@@ -578,6 +607,7 @@ const Luna<Packet>::FunctionType Packet::methods[] = {
     method(Packet, WriteByteSeq),
     method(Packet, WriteMyGUID),
     method(Packet, WriteTargetGUID),
+    method(Packet, WriteMouseOverGUID),
 
     method(Packet, ReadInt8),
     method(Packet, ReadInt16),

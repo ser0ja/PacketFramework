@@ -45,6 +45,8 @@ Members of **Packet**
   + Works only if both Offset::LocalPlayer and Offset::LocalPlayerGUID are provided
 + WriteTargetGUID()
   + Works only if Offset::CurrentTargetGUID is provided
++ WriteMouseOverGUID()
+  + Works only if Offset::MouseOverGUID is provided
 + ReadInt8()
 + ReadInt16()
 + ReadInt32()
