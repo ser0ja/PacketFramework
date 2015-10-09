@@ -207,7 +207,6 @@ end
 ``` lua
 function OnSend(packet)
     if (packet.GetOpcode() == CMSG_RANDOM_ROLL) then
-        packet.SyncWritePosition()
         packet.WriteInt32(100)
         packet.WriteInt32(100)
         min = packet.ReadInt32()
@@ -231,6 +230,40 @@ function OnSend(packet)
         customRoll.Send()
     end
     
+    return true
+end
+```
+
++ Print messages ingame (*packet structure is for 6.2.2*)
+``` lua
+function PrintIngame(message) 
+    packet = Packet(SMSG_CHAT)
+    packet.WriteInt8(0)
+    packet.WriteInt8(0)
+    packet.WriteMyGUID()
+    packet.WriteInt128("00000000000000000000000000000000")
+    packet.WriteInt128("00000000000000000000000000000000")
+    packet.WriteInt128("00000000000000000000000000000000")
+    packet.WriteInt32(0)
+    packet.WriteInt32(0)
+    packet.WriteInt128("00000000000000000000000000000000")
+    packet.WriteInt32(0)
+    packet.WriteFloat(0)
+    packet.WriteBits(0, 11)
+    packet.WriteBits(0, 11)
+    packet.WriteBits(0, 5)
+    packet.WriteBits(0, 7)
+    packet.WriteBits(string.len(message), 12)
+    packet.WriteBits(0, 11)
+    packet.WriteBit(0)
+    packet.WriteBit(0)
+    packet.FlushBits()
+    packet.WriteString(message)
+    packet.Process()
+end
+
+function OnSend(packet)
+    PrintIngame("Sent packet: " .. packet.GetOpcodeStr())
     return true
 end
 ```

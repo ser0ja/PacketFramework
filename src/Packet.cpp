@@ -30,6 +30,7 @@ Packet::Packet(CDataStore* data) : changed_(false)
 {
     append(data->Buffer, data->Length);
     rpos(sizeof(uint32_t));
+    wpos(sizeof(uint32_t));
 }
 
 Packet::Packet(lua_State* L) : ByteBuffer(0), changed_(false)
