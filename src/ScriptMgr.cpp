@@ -159,9 +159,6 @@ bool ScriptMgr::OnSend(CDataStore* data)
 
     for (auto const& script : Scripts)
     {
-        // Create the packet
-        Packet* packet = new Packet(data);
-
         // LUA function callback
         if (!lua_getglobal(script.second, "OnSend"))
         {
@@ -170,6 +167,7 @@ bool ScriptMgr::OnSend(CDataStore* data)
         }
 
         // Push packet
+        Packet* packet = new Packet(data);
         Luna<Packet>::push(script.second, packet);
 
         // Call the function
@@ -221,9 +219,6 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
 
     for (auto const& script : Scripts)
     {
-        // Create the packet
-        Packet* packet = new Packet(data);
-
         // LUA function callback
         if (!lua_getglobal(script.second, "OnProcessMessage"))
         {
@@ -232,6 +227,7 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
         }
 
         // Push packet
+        Packet* packet = new Packet(data);
         Luna<Packet>::push(script.second, packet);
 
         // Call the function
