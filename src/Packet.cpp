@@ -18,7 +18,7 @@
 #include "Packet.h"
 #include "Utils.h"
 #include "Offset.h"
-#include "HookMgr.h"
+#include "Hooks.h"
 #include "CDataStore.h"
 #include "ScriptMgr.h"
 #include "Opcodes.h"
@@ -560,25 +560,27 @@ int Packet::Truncate(lua_State* L)
 
 int Packet::Process(lua_State* L)
 {
-    // Process packet
     std::shared_ptr<CDataStore> data(new CDataStore(size()));
     memcpy(data->Buffer, contents(), size());
 
-    HookMgr::Intercept(HookProcessMessage, false);
-    HookMgr::ProcessMessage(Offset::NetClient, 0, 0, data.get(), 0);
-    HookMgr::Intercept(HookProcessMessage, true);
+    ProcessMessageHook::Lock();
+    ProcessMessageHook::Intercept(false);
+    ProcessMessageHook::OriginalFunction(Offset::NetClient, 0, 0, data.get(), 0);
+    ProcessMessageHook::Intercept(true);
+    ProcessMessageHook::Unlock();
     return 0;
 }
 
 int Packet::Send(lua_State* L)
 {
-    // Send the packet
     std::shared_ptr<CDataStore> data(new CDataStore(size()));
     memcpy(data->Buffer, contents(), size());
 
-    HookMgr::Intercept(HookSend, false);
-    HookMgr::Send(Offset::NetClient, data.get(), 0);
-    HookMgr::Intercept(HookSend, true);
+    SendHook::Lock();
+    SendHook::Intercept(false);
+    SendHook::OriginalFunction(Offset::NetClient, data.get(), 0);
+    SendHook::Intercept(true);
+    SendHook::Unlock();
     return 0;
 }
 

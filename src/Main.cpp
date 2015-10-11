@@ -17,7 +17,7 @@
 
 #include "Utils.h"
 #include "Console.h"
-#include "HookMgr.h"
+#include "Hooks.h"
 #include "Offset.h"
 #include "Version.h"
 #include <Windows.h>
@@ -33,8 +33,8 @@ int main()
     printf("NetClient::Send2: 0x%08X (0x%08X)\n", Offset::NetClient_Send2, Utils::GetBaseAddress() + Offset::NetClient_Send2);
     printf("NetClient::ProcessMessage: 0x%08X (0x%08X)\n", Offset::NetClient_ProcessMessage, Utils::GetBaseAddress() + Offset::NetClient_ProcessMessage);
     Console::SetTextColor(DARKGRAY);
-    HookMgr::Initialize();
-    HookMgr::Intercept(HookBoth, true);
+    SendHook::Initialize();
+    ProcessMessageHook::Initialize();
     Console::HandleCommands();
     return 0;
 }
