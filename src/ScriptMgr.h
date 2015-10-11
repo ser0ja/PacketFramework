@@ -31,8 +31,8 @@ class ScriptMgr
         static bool UnloadAll();
         static bool IsLoaded(const std::string& scriptName);
 
-        static bool OnSend(CDataStore* data);
-        static bool OnProcessMessage(CDataStore* data);
+        static bool OnSend(CDataStore* packet);
+        static bool OnProcessMessage(CDataStore* packet);
 
         static void AddOpcodes(lua_State* L);
 

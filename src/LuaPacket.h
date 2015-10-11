@@ -17,18 +17,16 @@
 
 #pragma once
 #include "ByteBuffer.h"
-#include <lua.hpp>
+#include "CDataStore.h"
 #include "Luna.h"
 
-struct CDataStore;
-
-class Packet : public ByteBuffer
+class LuaPacket : public ByteBuffer
 {
     public:
         // Constructs a packet from a CDataStore object
-        Packet(CDataStore* data);
+        LuaPacket(CDataStore* data);
         // Constructs a packet from LUA
-        Packet(lua_State* L);
+        LuaPacket(lua_State* L);
 
         // Helper
         bool IsChanged();
@@ -91,8 +89,8 @@ class Packet : public ByteBuffer
 
         // LUA
         static const char className[];
-        static const Luna<Packet>::PropertyType properties[];
-        static const Luna<Packet>::FunctionType methods[];
+        static const Luna<LuaPacket>::PropertyType properties[];
+        static const Luna<LuaPacket>::FunctionType methods[];
 
     private:
         bool changed_;

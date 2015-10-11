@@ -1,4 +1,5 @@
 #pragma once
+#include <lua.hpp>
 
 template < class T > class Luna {
   public:

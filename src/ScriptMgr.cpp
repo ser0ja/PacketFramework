@@ -17,7 +17,7 @@
 
 #include "ScriptMgr.h"
 #include "CDataStore.h"
-#include "Packet.h"
+#include "LuaPacket.h"
 #include "Console.h"
 #include "Opcodes.h"
 #include "MemoryEditor.h"
@@ -33,7 +33,7 @@ bool ScriptMgr::Load(const std::string& scriptName)
     luaL_openlibs(state);
 
     // Register bridged classes
-    Luna<Packet>::Register(state);
+    Luna<LuaPacket>::Register(state);
     Luna<MemoryEditor>::Register(state);
 
     // Push opcode enum
@@ -153,7 +153,7 @@ bool ScriptMgr::IsLoaded(const std::string& scriptName)
     return itr != Scripts.end();
 }
 
-bool ScriptMgr::OnSend(CDataStore* data)
+bool ScriptMgr::OnSend(CDataStore* packet)
 {
     bool allowPacket = true;
 
@@ -167,8 +167,8 @@ bool ScriptMgr::OnSend(CDataStore* data)
         }
 
         // Push packet
-        Packet* packet = new Packet(data);
-        Luna<Packet>::push(script.second, packet);
+        LuaPacket* luaPacket = new LuaPacket(packet);
+        Luna<LuaPacket>::push(script.second, luaPacket);
 
         // Call the function
         try
@@ -195,9 +195,9 @@ bool ScriptMgr::OnSend(CDataStore* data)
         lua_pop(script.second, 1);
 
         // Apply modifications if necessary
-        if (packet->IsChanged())
+        if (luaPacket->IsChanged())
         {
-            if (packet->size() > data->Length)
+            if (luaPacket->size() > packet->Length)
             {
                 Console::SetTextColor(RED);
                 printf("Error: The size of the modified packet must be less than or equal to the original packet's size!\n");
@@ -205,15 +205,15 @@ bool ScriptMgr::OnSend(CDataStore* data)
                 continue;
             }
 
-            memcpy(data->Buffer, packet->contents(), packet->size());
-            data->Length = packet->size();
+            memcpy(packet->Buffer, luaPacket->contents(), luaPacket->size());
+            packet->Length = luaPacket->size();
         }
     }
 
     return allowPacket;
 }
 
-bool ScriptMgr::OnProcessMessage(CDataStore* data)
+bool ScriptMgr::OnProcessMessage(CDataStore* packet)
 {
     bool allowPacket = true;
 
@@ -227,8 +227,8 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
         }
 
         // Push packet
-        Packet* packet = new Packet(data);
-        Luna<Packet>::push(script.second, packet);
+        LuaPacket* luaPacket = new LuaPacket(packet);
+        Luna<LuaPacket>::push(script.second, luaPacket);
 
         // Call the function
         try
@@ -255,9 +255,9 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
         lua_pop(script.second, 1);
 
         // Apply modifications if necessary
-        if (packet->IsChanged())
+        if (luaPacket->IsChanged())
         {
-            if (packet->size() > data->Length)
+            if (luaPacket->size() > packet->Length)
             {
                 Console::SetTextColor(RED);
                 printf("Error: The size of the modified packet must be less than or equal to the original packet's size!\n");
@@ -265,8 +265,8 @@ bool ScriptMgr::OnProcessMessage(CDataStore* data)
                 continue;
             }
 
-            memcpy(data->Buffer, packet->contents(), packet->size());
-            data->Length = packet->size();
+            memcpy(packet->Buffer, luaPacket->contents(), luaPacket->size());
+            packet->Length = luaPacket->size();
         }
     }
 

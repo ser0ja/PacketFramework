@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Packet.h"
+#include "LuaPacket.h"
 #include "Utils.h"
 #include "Offset.h"
 #include "Hooks.h"
@@ -26,14 +26,14 @@
 #include <memory>
 #include <iomanip>
 
-Packet::Packet(CDataStore* data) : changed_(false)
+LuaPacket::LuaPacket(CDataStore* data) : changed_(false)
 {
     append(data->Buffer, data->Length);
     rpos(sizeof(uint32_t));
     wpos(sizeof(uint32_t));
 }
 
-Packet::Packet(lua_State* L) : ByteBuffer(0), changed_(false)
+LuaPacket::LuaPacket(lua_State* L) : ByteBuffer(0), changed_(false)
 {
     uint32_t opcode = static_cast<uint32_t>(luaL_checknumber(L, 1));
     ByteBuffer::SetOpcode(opcode);
@@ -41,12 +41,12 @@ Packet::Packet(lua_State* L) : ByteBuffer(0), changed_(false)
     wpos(sizeof(uint32_t));
 }
 
-bool Packet::IsChanged()
+bool LuaPacket::IsChanged()
 {
     return changed_;
 }
 
-int Packet::WriteInt8(lua_State* L)
+int LuaPacket::WriteInt8(lua_State* L)
 {
     lua_Number value = luaL_checknumber(L, 1);
     *this << uint8_t(value);
@@ -54,7 +54,7 @@ int Packet::WriteInt8(lua_State* L)
     return 0;
 }
 
-int Packet::WriteInt16(lua_State* L)
+int LuaPacket::WriteInt16(lua_State* L)
 {
     lua_Number value = luaL_checknumber(L, 1);
     *this << uint16_t(value);
@@ -62,7 +62,7 @@ int Packet::WriteInt16(lua_State* L)
     return 0;
 }
 
-int Packet::WriteInt32(lua_State* L)
+int LuaPacket::WriteInt32(lua_State* L)
 {
     lua_Number value = luaL_checknumber(L, 1);
     *this << uint32_t(value);
@@ -70,7 +70,7 @@ int Packet::WriteInt32(lua_State* L)
     return 0;
 }
 
-int Packet::WriteInt64(lua_State* L)
+int LuaPacket::WriteInt64(lua_State* L)
 {
     lua_Number value = luaL_checknumber(L, 1);
     *this << uint64_t(value);
@@ -78,7 +78,7 @@ int Packet::WriteInt64(lua_State* L)
     return 0;
 }
 
-int Packet::WriteInt128(lua_State* L)
+int LuaPacket::WriteInt128(lua_State* L)
 {
     std::string hexStr = luaL_checkstring(L, 1);
 
@@ -109,7 +109,7 @@ int Packet::WriteInt128(lua_State* L)
     return 0;
 }
 
-int Packet::WriteBool(lua_State* L)
+int LuaPacket::WriteBool(lua_State* L)
 {
     bool value = (luaL_checknumber(L, 1) != 0);
     *this << bool(value);
@@ -117,7 +117,7 @@ int Packet::WriteBool(lua_State* L)
     return 0;
 }
 
-int Packet::WriteFloat(lua_State* L)
+int LuaPacket::WriteFloat(lua_State* L)
 {
     double value = luaL_checknumber(L, 1);
     *this << float(value);
@@ -125,7 +125,7 @@ int Packet::WriteFloat(lua_State* L)
     return 0;
 }
 
-int Packet::WriteDouble(lua_State* L)
+int LuaPacket::WriteDouble(lua_State* L)
 {
     double value = luaL_checknumber(L, 1);
     *this << double(value);
@@ -133,7 +133,7 @@ int Packet::WriteDouble(lua_State* L)
     return 0;
 }
 
-int Packet::WriteString(lua_State* L)
+int LuaPacket::WriteString(lua_State* L)
 {
     std::string value = luaL_checkstring(L, 1);
     ByteBuffer::WriteString(value);
@@ -141,7 +141,7 @@ int Packet::WriteString(lua_State* L)
     return 0;
 }
 
-int Packet::WriteCString(lua_State* L)
+int LuaPacket::WriteCString(lua_State* L)
 {
     std::string value = luaL_checkstring(L, 1);
     *this << std::string(value);
@@ -149,7 +149,7 @@ int Packet::WriteCString(lua_State* L)
     return 0;
 }
 
-int Packet::WriteBit(lua_State* L)
+int LuaPacket::WriteBit(lua_State* L)
 {
     uint32_t bit = static_cast<uint32_t>(luaL_checknumber(L, 1));
     ByteBuffer::WriteBit(bit);
@@ -157,7 +157,7 @@ int Packet::WriteBit(lua_State* L)
     return 0;
 }
 
-int Packet::WriteBits(lua_State* L)
+int LuaPacket::WriteBits(lua_State* L)
 {
     uint64_t value = static_cast<uint64_t>(luaL_checknumber(L, 1));
     uint32_t bits = static_cast<uint32_t>(luaL_checknumber(L, 2));
@@ -166,7 +166,7 @@ int Packet::WriteBits(lua_State* L)
     return 0;
 }
 
-int Packet::WriteByteSeq(lua_State* L)
+int LuaPacket::WriteByteSeq(lua_State* L)
 {
     uint8_t b = static_cast<uint8_t>(luaL_checknumber(L, 1));
     ByteBuffer::WriteByteSeq(b);
@@ -174,7 +174,7 @@ int Packet::WriteByteSeq(lua_State* L)
     return 0;
 }
 
-int Packet::WriteMyGUID(lua_State* L)
+int LuaPacket::WriteMyGUID(lua_State* L)
 {
     if (!Offset::LocalPlayer || !Offset::LocalPlayerGUID)
         return 0;
@@ -208,7 +208,7 @@ int Packet::WriteMyGUID(lua_State* L)
     return 0;
 }
 
-int Packet::WriteTargetGUID(lua_State* L)
+int LuaPacket::WriteTargetGUID(lua_State* L)
 {
     if (!Offset::CurrentTargetGUID)
         return 0;
@@ -237,7 +237,7 @@ int Packet::WriteTargetGUID(lua_State* L)
     return 0;
 }
 
-int Packet::WriteMouseOverGUID(lua_State* L)
+int LuaPacket::WriteMouseOverGUID(lua_State* L)
 {
     if (!Offset::MouseOverGUID)
         return 0;
@@ -266,7 +266,7 @@ int Packet::WriteMouseOverGUID(lua_State* L)
     return 0;
 }
 
-int Packet::ReadInt8(lua_State* L)
+int LuaPacket::ReadInt8(lua_State* L)
 {
     uint8_t value;
     *this >> value;
@@ -275,7 +275,7 @@ int Packet::ReadInt8(lua_State* L)
     return 1;
 }
 
-int Packet::ReadInt16(lua_State* L)
+int LuaPacket::ReadInt16(lua_State* L)
 {
     uint16_t value;
     *this >> value;
@@ -284,7 +284,7 @@ int Packet::ReadInt16(lua_State* L)
     return 1;
 }
 
-int Packet::ReadInt32(lua_State* L)
+int LuaPacket::ReadInt32(lua_State* L)
 {
     uint32_t value;
     *this >> value;
@@ -293,7 +293,7 @@ int Packet::ReadInt32(lua_State* L)
     return 1;
 }
 
-int Packet::ReadInt64(lua_State* L)
+int LuaPacket::ReadInt64(lua_State* L)
 {
     uint64_t value;
     *this >> value;
@@ -302,7 +302,7 @@ int Packet::ReadInt64(lua_State* L)
     return 1;
 }
 
-int Packet::ReadInt128(lua_State* L)
+int LuaPacket::ReadInt128(lua_State* L)
 {
     uint8_t lowMask, highMask;
     *this >> lowMask >> highMask;
@@ -321,7 +321,7 @@ int Packet::ReadInt128(lua_State* L)
     return 1;
 }
 
-int Packet::ReadBool(lua_State* L)
+int LuaPacket::ReadBool(lua_State* L)
 {
     bool value;
     *this >> value;
@@ -330,7 +330,7 @@ int Packet::ReadBool(lua_State* L)
     return 1;
 }
 
-int Packet::ReadFloat(lua_State* L)
+int LuaPacket::ReadFloat(lua_State* L)
 {
     float value;
     *this >> value;
@@ -339,7 +339,7 @@ int Packet::ReadFloat(lua_State* L)
     return 1;
 }
 
-int Packet::ReadDouble(lua_State* L)
+int LuaPacket::ReadDouble(lua_State* L)
 {
     double value;
     *this >> value;
@@ -348,7 +348,7 @@ int Packet::ReadDouble(lua_State* L)
     return 1;
 }
 
-int Packet::ReadString(lua_State* L)
+int LuaPacket::ReadString(lua_State* L)
 {
     uint32_t length = static_cast<uint32_t>(luaL_checknumber(L, 1));
     std::string value = ByteBuffer::ReadString(length);
@@ -356,7 +356,7 @@ int Packet::ReadString(lua_State* L)
     return 1;
 }
 
-int Packet::ReadCString(lua_State* L)
+int LuaPacket::ReadCString(lua_State* L)
 {
     std::string value;
     *this >> value;
@@ -365,14 +365,14 @@ int Packet::ReadCString(lua_State* L)
     return 1;
 }
 
-int Packet::ReadBit(lua_State* L)
+int LuaPacket::ReadBit(lua_State* L)
 {
     bool value = ByteBuffer::ReadBit();
     lua_pushnumber(L, value);
     return 1;
 }
 
-int Packet::ReadBits(lua_State* L)
+int LuaPacket::ReadBits(lua_State* L)
 {
     uint32_t size = static_cast<uint32_t>(luaL_checknumber(L, 1));
     uint32_t bits = ByteBuffer::ReadBits(size);
@@ -380,7 +380,7 @@ int Packet::ReadBits(lua_State* L)
     return 1;
 }
 
-int Packet::ReadByteSeq(lua_State* L)
+int LuaPacket::ReadByteSeq(lua_State* L)
 {
     uint8_t b;
     ByteBuffer::ReadByteSeq(b);
@@ -388,26 +388,26 @@ int Packet::ReadByteSeq(lua_State* L)
     return 1;
 }
 
-int Packet::FlushBits(lua_State* L)
+int LuaPacket::FlushBits(lua_State* L)
 {
     ByteBuffer::FlushBits();
     changed_ = true;
     return 0;
 }
 
-int Packet::ResetBitPosition(lua_State* L)
+int LuaPacket::ResetBitPosition(lua_State* L)
 {
     ByteBuffer::ResetBitPos();
     return 0;
 }
 
-int Packet::Print(lua_State* L)
+int LuaPacket::Print(lua_State* L)
 {
     hexlike();
     return 0;
 }
 
-int Packet::Dump(lua_State* L)
+int LuaPacket::Dump(lua_State* L)
 {
     // Save old rpos and seek to the beginning (without the opcode)
     size_t oldrpos = rpos();
@@ -475,20 +475,20 @@ int Packet::Dump(lua_State* L)
     return pushed;
 }
 
-int Packet::GetSize(lua_State* L)
+int LuaPacket::GetSize(lua_State* L)
 {
     lua_pushnumber(L, size());
     return 1;
 }
 
-int Packet::GetOpcode(lua_State* L)
+int LuaPacket::GetOpcode(lua_State* L)
 {
     uint32_t opcode = ByteBuffer::GetOpcode();
     lua_pushnumber(L, opcode);
     return 1;
 }
 
-int Packet::GetOpcodeStr(lua_State* L)
+int LuaPacket::GetOpcodeStr(lua_State* L)
 {
     uint32_t opcode = ByteBuffer::GetOpcode();
     
@@ -505,7 +505,7 @@ int Packet::GetOpcodeStr(lua_State* L)
     return 1;
 }
 
-int Packet::SetOpcode(lua_State* L)
+int LuaPacket::SetOpcode(lua_State* L)
 {
     uint32_t opcode = static_cast<uint32_t>(luaL_checknumber(L, 1));
     ByteBuffer::SetOpcode(opcode);
@@ -513,45 +513,45 @@ int Packet::SetOpcode(lua_State* L)
     return 0;
 }
 
-int Packet::SetWritePosition(lua_State* L)
+int LuaPacket::SetWritePosition(lua_State* L)
 {
     uint32_t position = static_cast<uint32_t>(luaL_checknumber(L, 1));
     wpos(position);
     return 0;
 }
 
-int Packet::GetWritePosition(lua_State* L)
+int LuaPacket::GetWritePosition(lua_State* L)
 {
     lua_pushnumber(L, wpos());
     return 1;
 }
 
-int Packet::SetReadPosition(lua_State* L)
+int LuaPacket::SetReadPosition(lua_State* L)
 {
     uint32_t position = static_cast<uint32_t>(luaL_checknumber(L, 1));
     rpos(position);
     return 0;
 }
 
-int Packet::GetReadPosition(lua_State* L)
+int LuaPacket::GetReadPosition(lua_State* L)
 {
     lua_pushnumber(L, rpos());
     return 1;
 }
 
-int Packet::SyncWritePosition(lua_State* L)
+int LuaPacket::SyncWritePosition(lua_State* L)
 {
     wpos(rpos());
     return 0;
 }
 
-int Packet::SyncReadPosition(lua_State* L)
+int LuaPacket::SyncReadPosition(lua_State* L)
 {
     rpos(wpos());
     return 0;
 }
 
-int Packet::Truncate(lua_State* L)
+int LuaPacket::Truncate(lua_State* L)
 {
     uint32_t position = static_cast<uint32_t>(luaL_checknumber(L, 1));
     ByteBuffer tmp;
@@ -562,7 +562,7 @@ int Packet::Truncate(lua_State* L)
     return 0;
 }
 
-int Packet::Process(lua_State* L)
+int LuaPacket::Process(lua_State* L)
 {
     std::shared_ptr<CDataStore> data(new CDataStore(size()));
     memcpy(data->Buffer, contents(), size());
@@ -575,7 +575,7 @@ int Packet::Process(lua_State* L)
     return 0;
 }
 
-int Packet::Send(lua_State* L)
+int LuaPacket::Send(lua_State* L)
 {
     std::shared_ptr<CDataStore> data(new CDataStore(size()));
     memcpy(data->Buffer, contents(), size());
@@ -590,62 +590,62 @@ int Packet::Send(lua_State* L)
 
 #define method(class, name) {#name, &class::name}
 
-const char Packet::className[] = "Packet";
+const char LuaPacket::className[] = "Packet";
 
-const Luna<Packet>::PropertyType Packet::properties[] = {
+const Luna<LuaPacket>::PropertyType LuaPacket::properties[] = {
     { 0, 0 }
 };
 
-const Luna<Packet>::FunctionType Packet::methods[] = {
-    method(Packet, WriteInt8),
-    method(Packet, WriteInt16),
-    method(Packet, WriteInt32),
-    method(Packet, WriteInt64),
-    method(Packet, WriteInt128),
-    method(Packet, WriteBool),
-    method(Packet, WriteFloat),
-    method(Packet, WriteDouble),
-    method(Packet, WriteString),
-    method(Packet, WriteCString),
-    method(Packet, WriteBit),
-    method(Packet, WriteBits),
-    method(Packet, WriteByteSeq),
-    method(Packet, WriteMyGUID),
-    method(Packet, WriteTargetGUID),
-    method(Packet, WriteMouseOverGUID),
+const Luna<LuaPacket>::FunctionType LuaPacket::methods[] = {
+    method(LuaPacket, WriteInt8),
+    method(LuaPacket, WriteInt16),
+    method(LuaPacket, WriteInt32),
+    method(LuaPacket, WriteInt64),
+    method(LuaPacket, WriteInt128),
+    method(LuaPacket, WriteBool),
+    method(LuaPacket, WriteFloat),
+    method(LuaPacket, WriteDouble),
+    method(LuaPacket, WriteString),
+    method(LuaPacket, WriteCString),
+    method(LuaPacket, WriteBit),
+    method(LuaPacket, WriteBits),
+    method(LuaPacket, WriteByteSeq),
+    method(LuaPacket, WriteMyGUID),
+    method(LuaPacket, WriteTargetGUID),
+    method(LuaPacket, WriteMouseOverGUID),
 
-    method(Packet, ReadInt8),
-    method(Packet, ReadInt16),
-    method(Packet, ReadInt32),
-    method(Packet, ReadInt64),
-    method(Packet, ReadInt128),
-    method(Packet, ReadBool),
-    method(Packet, ReadFloat),
-    method(Packet, ReadDouble),
-    method(Packet, ReadString),
-    method(Packet, ReadCString),
-    method(Packet, ReadBit),
-    method(Packet, ReadBits),
-    method(Packet, ReadByteSeq),
+    method(LuaPacket, ReadInt8),
+    method(LuaPacket, ReadInt16),
+    method(LuaPacket, ReadInt32),
+    method(LuaPacket, ReadInt64),
+    method(LuaPacket, ReadInt128),
+    method(LuaPacket, ReadBool),
+    method(LuaPacket, ReadFloat),
+    method(LuaPacket, ReadDouble),
+    method(LuaPacket, ReadString),
+    method(LuaPacket, ReadCString),
+    method(LuaPacket, ReadBit),
+    method(LuaPacket, ReadBits),
+    method(LuaPacket, ReadByteSeq),
 
-    method(Packet, FlushBits),
-    method(Packet, ResetBitPosition),
+    method(LuaPacket, FlushBits),
+    method(LuaPacket, ResetBitPosition),
 
-    method(Packet, Print),
-    method(Packet, Dump),
-    method(Packet, GetSize),
-    method(Packet, GetOpcode),
-    method(Packet, GetOpcodeStr),
-    method(Packet, SetOpcode),
-    method(Packet, SetWritePosition),
-    method(Packet, GetWritePosition),
-    method(Packet, SetReadPosition),
-    method(Packet, GetReadPosition),
-    method(Packet, SyncWritePosition),
-    method(Packet, SyncReadPosition),
-    method(Packet, Truncate),
+    method(LuaPacket, Print),
+    method(LuaPacket, Dump),
+    method(LuaPacket, GetSize),
+    method(LuaPacket, GetOpcode),
+    method(LuaPacket, GetOpcodeStr),
+    method(LuaPacket, SetOpcode),
+    method(LuaPacket, SetWritePosition),
+    method(LuaPacket, GetWritePosition),
+    method(LuaPacket, SetReadPosition),
+    method(LuaPacket, GetReadPosition),
+    method(LuaPacket, SyncWritePosition),
+    method(LuaPacket, SyncReadPosition),
+    method(LuaPacket, Truncate),
 
-    method(Packet, Process),
-    method(Packet, Send),
+    method(LuaPacket, Process),
+    method(LuaPacket, Send),
     { 0, 0 }
 };
