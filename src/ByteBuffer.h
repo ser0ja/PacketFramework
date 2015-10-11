@@ -22,8 +22,6 @@
 
 #include <cstdint>
 #include <cassert>
-#include "ByteConverter.h"
-
 #include <exception>
 #include <list>
 #include <map>
@@ -135,7 +133,6 @@ class ByteBuffer
         template <typename T> void append(T value)
         {
             static_assert(std::is_fundamental<T>::value, "append(compound)");
-            EndianConvert(value);
             append((uint8_t *)&value, sizeof(value));
         }
 
@@ -219,7 +216,6 @@ class ByteBuffer
         template <typename T> void put(size_t pos, T value)
         {
             static_assert(std::is_fundamental<T>::value, "append(compound)");
-            EndianConvert(value);
             put(pos, (uint8_t *)&value, sizeof(value));
         }
 
@@ -486,7 +482,6 @@ class ByteBuffer
             if (pos + sizeof(T) > size())
                 throw ByteBufferPositionException(false, pos, sizeof(T), size());
             T val = *((T const*)&_storage[pos]);
-            EndianConvert(val);
             return val;
         }
 
