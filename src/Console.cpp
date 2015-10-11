@@ -46,7 +46,12 @@ void Console::HandleCommands()
         std::vector<std::string> args = Utils::Split(line, ' ');
 
         if (args.empty())
+        {
+            SetTextColor(RED);
+            printf("No such command.\n");
+            SetTextColor(DARKGRAY);
             continue;
+        }
 
         if (args[0] == "load")
         {
@@ -66,6 +71,15 @@ void Console::HandleCommands()
         {
             ScriptMgr::UnloadAll();
         }
+        else
+        {
+            SetTextColor(RED);
+            printf("No such command.\n");
+            SetTextColor(DARKGRAY);
+        }
+
+        SetTextColor(DARKGRAY);
+        printf(">");
     }
 }
 

@@ -26,15 +26,21 @@
 int main()
 {
     Console::Initialize();
+
     Console::SetTextColor(CYAN);
     printf("PacketFramework for %s (%d)\n", Version.c_str(), Build);
+    printf("Source code is available at https://github.com/Dehravor/PacketFramework\n");
     Console::SetTextColor(GREEN);
-    printf("Base: 0x%08X\n", Utils::GetBaseAddress());
-    printf("NetClient::Send2: 0x%08X (0x%08X)\n", Offset::NetClient_Send2, Utils::GetBaseAddress() + Offset::NetClient_Send2);
-    printf("NetClient::ProcessMessage: 0x%08X (0x%08X)\n", Offset::NetClient_ProcessMessage, Utils::GetBaseAddress() + Offset::NetClient_ProcessMessage);
+    printf("[Commands]\n");
+    printf(" - load scriptname\n");
+    printf(" - unload scriptname\n");
+    printf(" - unloadall\n");
     Console::SetTextColor(DARKGRAY);
+    printf(">");
+
     SendHook::Initialize();
     ProcessMessageHook::Initialize();
+
     Console::HandleCommands();
     return 0;
 }
