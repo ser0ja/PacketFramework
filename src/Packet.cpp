@@ -180,6 +180,10 @@ int Packet::WriteMyGUID(lua_State* L)
         return 0;
 
     intptr_t localPlayer = *(intptr_t*)(Utils::GetBaseAddress() + Offset::LocalPlayer);
+
+    if (!localPlayer)
+        return 0;
+
     uint64_t low = *(uint64_t*)(localPlayer + Offset::LocalPlayerGUID);
     uint64_t high = *(uint64_t*)(localPlayer + Offset::LocalPlayerGUID + sizeof(uint64_t));
 
