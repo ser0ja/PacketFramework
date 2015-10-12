@@ -267,3 +267,35 @@ function OnSend(packet)
     return true
 end
 ```
+
++ Create an ingame command (*packet structure is for 6.2.2*)
+``` lua
+function OnSend(packet)
+    if (packet.GetOpcode() == CMSG_CHAT_MESSAGE_SAY) then
+        language = packet.ReadInt32()
+        length = packet.ReadBits(8)
+        text = packet.ReadString(length)
+        
+        -- Command: .myroll max
+        -- Rolls between 1 and $max
+        if (string.sub(text, 0, 7) == ".myroll") then
+            max = tonumber(string.sub(text, 9))
+
+            if (type(max) ~= "number") then
+                return false
+            end
+            
+            rollPacket = Packet(CMSG_RANDOM_ROLL)
+            rollPacket.WriteInt32(1)
+            rollPacket.WriteInt32(max)
+            rollPacket.WriteInt8(1)
+            rollPacket.Send()
+            
+            -- Don't show our command to the server and others
+            return false
+        end
+    end
+    
+    return true
+end
+```
